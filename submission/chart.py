@@ -1,23 +1,21 @@
 import matplotlib.pyplot as plt
 import seaborn as sns
-from PIL import Image
-import io
 
-# Create oversized figure
-fig, ax = plt.subplots(figsize=(8, 8), dpi=100)
+# Set exact dimensions for square output
+dpi = 100
+fig_size = 5.12  # 512 pixels / 100 dpi = 5.12 inches
 
+fig, ax = plt.subplots(figsize=(fig_size, fig_size), dpi=dpi)
+
+# Create heatmap with square cells
 sns.heatmap(correlation_matrix, annot=True, fmt='.2f', 
-            cmap='coolwarm', center=0, ax=ax)
+            cmap='coolwarm', center=0, ax=ax,
+            square=True,  # This ensures square cells
+            cbar_kws={'shrink': 0.8})
 
-plt.tight_layout()
+# Remove extra whitespace
+plt.tight_layout(pad=0.5)
 
-# Save to buffer
-buf = io.BytesIO()
-plt.savefig(buf, format='png', bbox_inches='tight', dpi=100)
-buf.seek(0)
+# Save WITHOUT bbox_inches='tight' to preserve dimensions
+plt.savefig('heatmap.png', dpi=dpi, pad_inches=0.1)
 plt.close()
-
-# Resize to exact 512x512
-img = Image.open(buf)
-img = img.resize((512, 512), Image.Resampling.LANCZOS)
-img.save('heatmap.png')
